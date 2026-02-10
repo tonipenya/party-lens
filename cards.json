@@ -1,18 +1,122 @@
 [
     {
-        "text": "Pose absurda",
-        "type": "photo"
-    },
-    {
-        "text": "Ordenaros por edad",
+        "text": "Aplaudid al unísono durante 5 segundos",
         "type": "action"
     },
     {
-        "text": "Abrazo incómodo",
+        "text": "Cambiad de sitio con alguien que no conozcáis mucho",
+        "type": "action"
+    },
+    {
+        "text": "Cambiad un objeto personal con alguien",
+        "type": "action"
+    },
+    {
+        "text": "Caminad como si el suelo fuera lava",
+        "type": "action"
+    },
+    {
+        "text": "Chocad hombros con alguien cercano",
+        "type": "action"
+    },
+    {
+        "text": "Chocad los cinco con tres personas distintas",
+        "type": "action"
+    },
+    {
+        "text": "Imitad el sonido de un animal durante 5 segundos",
+        "type": "action"
+    },
+    {
+        "text": "Ordenaos por altura sin hablar",
+        "type": "action"
+    },
+    {
+        "text": "Ordenaos por edad sin hablar",
+        "type": "action"
+    },
+    {
+        "text": "Respirad profundo todos a la vez",
+        "type": "action"
+    },
+    {
+        "text": "Daos un abrazo incómodo",
         "type": "photo"
     },
     {
-        "text": "A la derecha: Una cosa que te guste. A la izquierda: Una cosa que odies",
+        "text": "Posad saltando… aunque no saltéis",
+        "type": "photo"
+    },
+    {
+        "text": "Posad señalando a alguien al azar",
+        "type": "photo"
+    },
+    {
+        "text": "Haced una pose absurda",
+        "type": "photo"
+    },
+    {
+        "text": "Imitad una estatua famosa inventada",
+        "type": "photo"
+    },
+    {
+        "text": "Mostrad una sonrisa real, sin posar",
+        "type": "photo"
+    },
+    {
+        "text": "Poned cara de póster de película dramática",
+        "type": "photo"
+    },
+    {
+        "text": "Poned mirada intensa a la persona más cercana",
+        "type": "photo"
+    },
+    {
+        "text": "Posad como si acabarais de ganar un premio importante",
+        "type": "photo"
+    },
+    {
+        "text": "Posad como si fuerais una banda de música",
+        "type": "photo"
+    },
+    {
+        "text": "Comparte algo por lo que estés agradecido ahora mismo",
+        "type": "talk"
+    },
+    {
+        "text": "Contad algo pequeño que te haya hecho sonreír hoy",
+        "type": "talk"
+    },
+    {
+        "text": "Contad algo que aprendiste recientemente",
+        "type": "talk"
+    },
+    {
+        "text": "Contad un plan sencillo que te haga ilusión",
+        "type": "talk"
+    },
+    {
+        "text": "Dadle las gracias a alguien del grupo",
+        "type": "talk"
+    },
+    {
+        "text": "Decid: derecha algo que os guste; izquierda algo que odiéis",
+        "type": "talk"
+    },
+    {
+        "text": "Decid algo que te guste de estar aquí hoy",
+        "type": "talk"
+    },
+    {
+        "text": "Di tu comida favorita y la que menos te gusta",
+        "type": "talk"
+    },
+    {
+        "text": "Di una manía rara que tengas",
+        "type": "talk"
+    },
+    {
+        "text": "Mirad alrededor y nombrad algo bonito que veáis",
         "type": "talk"
     }
 ]
