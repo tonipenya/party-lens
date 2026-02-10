@@ -1,9 +1,11 @@
 import { Camera } from "./camera.js";
 
 let cards = [];
-const TIME_BETWEEN_CARDS = 10000; // milliseconds
-const TIME_CARD_VISIBLE = 5000; // milliseconds
-const PICTURE_DELAY = 2000; // milliseconds
+// Times in milliseconds
+const TIME_BETWEEN_CARDS = 10000;
+const TIME_CARD_VISIBLE = 5000;
+const FIRST_PICTURE_DELAY = 2000;
+const DELAY_BETWEEN_PICTURES = 1000;
 const camera = new Camera(document.getElementById("overlay"));
 
 function displayNewCard() {
@@ -12,7 +14,11 @@ function displayNewCard() {
         .then(getNextCard)
         .then(showCard)
         .then(turnDisplayOn)
-        .then(delayedExecution(camera.takePicture, PICTURE_DELAY))
+        .then(delayedExecution(camera.takePicture, FIRST_PICTURE_DELAY))
+        .then(showCapturedImage)
+        .then(delayedExecution(camera.takePicture, DELAY_BETWEEN_PICTURES))
+        .then(showCapturedImage)
+        .then(delayedExecution(camera.takePicture, DELAY_BETWEEN_PICTURES))
         .then(showCapturedImage)
         .then(camera.stopCamera)
         .then(delayedExecution(turnDisplayOff, TIME_CARD_VISIBLE));
