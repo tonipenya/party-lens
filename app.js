@@ -5,6 +5,7 @@ const TIME_BETWEEN_CARDS = 10000; // milliseconds
 const TIME_CARD_VISIBLE = 5000; // milliseconds
 const PICTURE_DELAY = 2000; // milliseconds
 const camera = new Camera(document.getElementById("overlay"));
+let hasStarted = false;
 
 function displayNewCard() {
     return camera
@@ -18,14 +19,68 @@ function displayNewCard() {
         .then(delayedExecution(turnDisplayOff, TIME_CARD_VISIBLE));
 }
 
-fetch("cards.json")
+showStartCard();
+bindStartCard()
+    .then(turnDisplayOff)
+    .then(() => fetch("cards.json"))
     .then((response) => response.json())
     .then(shuffle)
     .then((shuffledCards) => (cards = shuffledCards))
-    .then(() => setInterval(displayNewCard, TIME_BETWEEN_CARDS))
+    .then(startAutoDisplay)
     .catch((error) => console.error("Error loading cards:", error));
 
 // Core flow utilities are defined below.
+function showStartCard() {
+    const container = document.getElementById("container");
+    const template = document.getElementById("card-template");
+    const clone = template.content.cloneNode(true);
+    clone.getElementById("card-text").textContent = "Click to start";
+    container.setAttribute("data-type", "none");
+    container.replaceChildren(clone);
+}
+
+function requestFullscreen() {
+    const element = document.documentElement;
+    if (document.fullscreenElement) {
+        return Promise.resolve();
+    }
+    if (element.requestFullscreen) {
+        return element.requestFullscreen();
+    }
+    if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+        return Promise.resolve();
+    }
+    return Promise.resolve();
+}
+
+function bindStartCard() {
+    const container = document.getElementById("container");
+    return new Promise((resolve) => {
+        container.addEventListener(
+            "click",
+            () => {
+                if (hasStarted) {
+                    return;
+                }
+                hasStarted = true;
+                requestFullscreen()
+                    .catch((error) => console.warn("Fullscreen request failed:", error))
+                    .finally(resolve);
+            },
+            { once: true },
+        );
+    });
+}
+
+async function startAutoDisplay() {
+    while (cards.length > 0) {
+        await displayNewCard();
+        await delayedExecution(() => {}, TIME_BETWEEN_CARDS);
+    }
+
+    turnDisplayOff();
+}
 
 function getNextCard(data) {
     const card = cards.pop();
@@ -103,11 +158,17 @@ function shuffle(array) {
 }
 
 function delayedExecution(fn, delay) {
-    return (data) =>
+    const delayedFn = (data) =>
         new Promise((resolve) => {
             setTimeout(() => {
                 fn(data);
                 resolve(data);
             }, delay);
         });
+
+    // Also allow: await delayedExecution(fn, delay)
+    delayedFn.then = (resolve, reject) =>
+        delayedFn(undefined).then(resolve, reject);
+
+    return delayedFn;
 }
