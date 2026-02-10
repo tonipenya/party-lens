@@ -17,10 +17,11 @@ const UI_TEXTS = {
     },
 };
 // Times in milliseconds
-const TIME_BETWEEN_CARDS = 10000;
-const TIME_CARD_VISIBLE = 5000;
-const FIRST_PICTURE_DELAY = 2000;
-const DELAY_BETWEEN_PICTURES = 1000;
+const CARD_INTERVAL_START_MINUTES = 10;
+const CARD_INTERVAL_STEP_MINUTES = 2;
+const CARD_INTERVAL_MAX_MINUTES = 25;
+const FIRST_PICTURE_DELAY = 5000;
+const DELAY_BETWEEN_PICTURES = 2000;
 const camera = new Camera(document.getElementById("overlay"));
 
 function displayNewCard() {
@@ -36,7 +37,7 @@ function displayNewCard() {
         .then(delayedExecution(camera.takePicture, DELAY_BETWEEN_PICTURES))
         .then(showCapturedImage)
         .then(camera.stopCamera)
-        .then(delayedExecution(turnDisplayOff, TIME_CARD_VISIBLE));
+        .then(delayedExecution(turnDisplayOff, DELAY_BETWEEN_PICTURES));
 }
 
 showStartCard();
@@ -89,9 +90,15 @@ function bindStartCard() {
 }
 
 async function startAutoDisplay() {
+    let waitMinutes = CARD_INTERVAL_START_MINUTES;
+
+    await displayNewCard();
     while (cards.length > 0) {
-        await displayNewCard();
-        await delayedExecution(() => {}, TIME_BETWEEN_CARDS);
+        await delayedExecution(displayNewCard, waitMinutes * 60 * 1000);
+        waitMinutes = Math.min(
+            waitMinutes + CARD_INTERVAL_STEP_MINUTES,
+            CARD_INTERVAL_MAX_MINUTES,
+        );
     }
 
     turnDisplayOff();
@@ -192,14 +199,12 @@ function delayedExecution(fn, delay) {
     const delayedFn = (data) =>
         new Promise((resolve) => {
             setTimeout(() => {
-                fn(data);
-                resolve(data);
+                Promise.resolve(fn(data)).then(() => resolve(data));
             }, delay);
         });
 
     // Also allow: await delayedExecution(fn, delay)
-    delayedFn.then = (resolve, reject) =>
-        delayedFn(undefined).then(resolve, reject);
+    delayedFn.then = (resolve, reject) => delayedFn(undefined).then(resolve, reject);
 
     return delayedFn;
 }
