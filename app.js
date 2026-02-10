@@ -5,7 +5,6 @@ const TIME_BETWEEN_CARDS = 10000; // milliseconds
 const TIME_CARD_VISIBLE = 5000; // milliseconds
 const PICTURE_DELAY = 2000; // milliseconds
 const camera = new Camera(document.getElementById("overlay"));
-let hasStarted = false;
 
 function displayNewCard() {
     return camera
@@ -40,16 +39,15 @@ function showStartCard() {
 }
 
 function requestFullscreen() {
-    const element = document.documentElement;
     if (document.fullscreenElement) {
         return Promise.resolve();
     }
+    const element = document.documentElement;
     if (element.requestFullscreen) {
         return element.requestFullscreen();
     }
     if (element.webkitRequestFullscreen) {
         element.webkitRequestFullscreen();
-        return Promise.resolve();
     }
     return Promise.resolve();
 }
@@ -60,10 +58,6 @@ function bindStartCard() {
         container.addEventListener(
             "click",
             () => {
-                if (hasStarted) {
-                    return;
-                }
-                hasStarted = true;
                 requestFullscreen()
                     .catch((error) => console.warn("Fullscreen request failed:", error))
                     .finally(resolve);
@@ -91,26 +85,14 @@ function getNextCard(data) {
 }
 
 function showCard(data) {
-    const { card, video } = data;
+    const { card } = data;
     const container = document.getElementById("container");
     const template = document.getElementById("card-template");
 
-    if (!card) {
-        const clone = template.content.cloneNode(true);
-        clone.getElementById("card-text").textContent = "No more cards!";
-        container.setAttribute("data-type", "none");
-        return data;
-    }
-
     const clone = template.content.cloneNode(true);
-    clone.getElementById("card-text").textContent = card.text;
-    container.setAttribute("data-type", card.type);
-
-    const currentCard = document.querySelector(".card");
-    if (currentCard) {
-        container.removeChild(currentCard);
-    }
-    container.appendChild(clone);
+    clone.getElementById("card-text").textContent = card ? card.text : "No more cards!";
+    container.setAttribute("data-type", card?.type ?? "none");
+    container.replaceChildren(clone);
 
     return data;
 }

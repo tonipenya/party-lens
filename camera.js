@@ -8,31 +8,28 @@ class Camera {
         this.stopCamera = this.stopCamera.bind(this);
     }
 
-    startCamera() {
-        return navigator.mediaDevices
-            .getUserMedia({
-                video: {
-                    width: { ideal: 4096 },
-                    height: { ideal: 4096 },
-                },
-            })
-            .then((stream) => {
-                this.currentStream = stream;
-                const video = document.createElement("video");
-                this.currentVideo = video;
-                video.srcObject = stream;
-                video.muted = true;
-                video.playsInline = true;
-                
-                return new Promise((resolve, reject) => {
-                    video.onloadedmetadata = () => {
-                        video.play()
-                            .then(() => resolve({ card: null, video }))
-                            .catch(reject);
-                    };
-                    video.onerror = reject;
-                });
-            });
+    async startCamera() {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: { ideal: 4096 },
+                height: { ideal: 4096 },
+            },
+        });
+
+        this.currentStream = stream;
+        const video = document.createElement("video");
+        this.currentVideo = video;
+        video.srcObject = stream;
+        video.muted = true;
+        video.playsInline = true;
+
+        await new Promise((resolve, reject) => {
+            video.addEventListener("loadedmetadata", resolve, { once: true });
+            video.addEventListener("error", reject, { once: true });
+        });
+
+        await video.play();
+        return { card: null, video };
     }
 
     takePicture(data) {
@@ -51,14 +48,15 @@ class Camera {
         data.capturedImageSrc = canvas.toDataURL("image/png");
 
         canvas.toBlob((blob) => {
-            if (blob) {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `${card.text}.png`;
-                a.click();
-                URL.revokeObjectURL(url);
+            if (!blob) {
+                return;
             }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${card.text}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
         }, "image/png");
     }
 
