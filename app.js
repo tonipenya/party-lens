@@ -33,7 +33,7 @@ function showStartCard() {
     const container = document.getElementById("container");
     const template = document.getElementById("card-template");
     const clone = template.content.cloneNode(true);
-    clone.getElementById("card-text").textContent = "Click to start";
+    clone.getElementById("card-text").innerHTML = "Click to start<br>(📸 / ⚡️ / 💬)";
     container.setAttribute("data-type", "none");
     container.replaceChildren(clone);
 }

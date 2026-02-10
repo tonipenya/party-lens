@@ -2,6 +2,7 @@
     --color-photo: #ffb6c1;
     --color-action: #87ceeb;
     --color-talk: #ffd700;
+    --color-start: #fff4dc;
     --color-text: #333;
     --color-blackout: #000;
 }
@@ -31,6 +32,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--color-start);
 }
 
 #container[data-type="photo"] {
