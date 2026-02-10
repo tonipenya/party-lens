@@ -15,8 +15,7 @@ function displayNewCard() {
         .then(delayedExecution(camera.takePicture, PICTURE_DELAY))
         .then(showCapturedImage)
         .then(camera.stopCamera)
-        .then(delayedExecution(turnDisplayOff, TIME_CARD_VISIBLE))
-        .then(hideCapturedImage);
+        .then(delayedExecution(turnDisplayOff, TIME_CARD_VISIBLE));
 }
 
 fetch("cards.json")
@@ -81,16 +80,9 @@ function showCapturedImage(data) {
     const clone = template.content.cloneNode(true);
     const image = clone.querySelector(".captured-photo");
     image.src = capturedImageSrc;
+    card.classList.add("with-photo");
     card.appendChild(clone);
 
-    return data;
-}
-
-function hideCapturedImage(data) {
-    const imageContainer = document.querySelector(".captured-photo-container");
-    if (imageContainer) {
-        imageContainer.remove();
-    }
     return data;
 }
 

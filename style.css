@@ -29,9 +29,8 @@ body {
     position: absolute;
     inset: 0;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding-top: 15vh;
 }
 
 #container[data-type="photo"] {
@@ -47,20 +46,49 @@ body {
 }
 
 .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    width: min(92vw, 1200px);
+    width: min(94vw, 1400px);
+    min-height: 82vh;
+    transition: transform 320ms ease;
+}
+
+.card.with-photo {
+    justify-content: flex-start;
+    padding-top: 4vh;
+    transform: translateY(-4vh);
 }
 
 #card-text {
-    font-size: 48px;
-    line-height: 1.4;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1.1;
     font-weight: bold;
 }
 
+#container[data-type="photo"] #card-text::before {
+    content: "📸 ";
+}
+
+#container[data-type="action"] #card-text::before {
+    content: "⚡️ ";
+}
+
+#container[data-type="talk"] #card-text::before {
+    content: "💬 ";
+}
+
+.card.with-photo #card-text {
+    font-size: clamp(2rem, 4.5vw, 3.8rem);
+    margin-bottom: 3vh;
+}
+
 .captured-photo-container {
-    width: min(90vw, 1100px);
-    height: 58vh;
-    margin: 48px auto 0;
+    width: min(92vw, 1250px);
+    height: 68vh;
+    margin: 0 auto 0;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgb(0 0 0 / 35%);
