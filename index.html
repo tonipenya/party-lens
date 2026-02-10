@@ -7,10 +7,8 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <div id="overlay"></div>
-        <div id="container">
-            <button id="next-btn">Next Card</button>
-        </div>
+        <div id="overlay" class="display-off"></div>
+        <div id="container"></div>
 
         <template id="card-template">
             <div class="card">
@@ -18,6 +16,12 @@
             </div>
         </template>
 
-        <script src="app.js"></script>
+        <template id="captured-image-template">
+            <div class="captured-photo-container">
+                <img class="captured-photo" alt="Captured photo" />
+            </div>
+        </template>
+
+        <script type="module" src="app.js"></script>
     </body>
 </html>

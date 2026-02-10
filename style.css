@@ -3,9 +3,6 @@
     --color-action: #87ceeb;
     --color-talk: #ffd700;
     --color-text: #333;
-    --color-button-bg: #333;
-    --color-button-bg-hover: #555;
-    --color-button-text: white;
     --color-blackout: #000;
 }
 
@@ -26,23 +23,6 @@ body {
     min-height: 100%;
     margin: 0;
     color: var(--color-text);
-}
-
-button {
-    position: fixed;
-    bottom: 30px;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-family: inherit;
-    background-color: var(--color-button-bg);
-    color: var(--color-button-text);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: var(--color-button-bg-hover);
 }
 
 #container {
@@ -68,7 +48,7 @@ button:hover {
 
 .card {
     text-align: center;
-    max-width: 80%;
+    width: min(92vw, 1200px);
 }
 
 #card-text {
@@ -77,16 +57,52 @@ button:hover {
     font-weight: bold;
 }
 
+.captured-photo-container {
+    width: min(90vw, 1100px);
+    height: 58vh;
+    margin: 48px auto 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 35%);
+}
+
+.captured-photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 #overlay {
     position: fixed;
     inset: 0;
-    background-color: var(--color-blackout);
-    opacity: 0;
+    background-color: rgb(0 0 0 / 0%);
+    transition: background-color 300ms ease;
     pointer-events: none;
     z-index: 1000;
 }
 
-#overlay.sleep {
-    opacity: 1;
+#overlay.display-off {
+    background-color: var(--color-blackout);
+    transition: background-color 1s ease;
     pointer-events: auto;
+}
+
+#overlay.flash {
+    animation: screen-flash 420ms ease-out;
+}
+
+@keyframes screen-flash {
+    0% {
+        background-color: rgb(255 255 255 / 0%);
+    }
+    20% {
+        background-color: rgb(255 255 255 / 100%);
+    }
+    55% {
+        background-color: rgb(255 255 255 / 100%);
+    }
+    100% {
+        background-color: rgb(255 255 255 / 0%);
+    }
 }
