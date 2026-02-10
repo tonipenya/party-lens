@@ -1,122 +1,242 @@
 [
     {
-        "text": "Aplaudid al unísono durante 5 segundos",
+        "texts": {
+            "es": "Aplaudid al unísono durante 5 segundos",
+            "ca": "Aplaudiu a l'uníson durant 5 segons",
+            "en": "Clap in unison for 5 seconds"
+        },
         "type": "action"
     },
     {
-        "text": "Cambiad de sitio con alguien que no conozcáis mucho",
+        "texts": {
+            "es": "Cambiad de sitio con alguien que no conozcáis mucho",
+            "ca": "Canvieu de lloc amb algú que no conegueu gaire",
+            "en": "Switch places with someone you don't know well"
+        },
         "type": "action"
     },
     {
-        "text": "Cambiad un objeto personal con alguien",
+        "texts": {
+            "es": "Cambiad un objeto personal con alguien",
+            "ca": "Intercanvieu un objecte personal amb algú",
+            "en": "Swap a personal item with someone"
+        },
         "type": "action"
     },
     {
-        "text": "Caminad como si el suelo fuera lava",
+        "texts": {
+            "es": "Caminad como si el suelo fuera lava",
+            "ca": "Camineu com si el terra fos lava",
+            "en": "Walk as if the floor were lava"
+        },
         "type": "action"
     },
     {
-        "text": "Chocad hombros con alguien cercano",
+        "texts": {
+            "es": "Chocad hombros con alguien cercano",
+            "ca": "Xoqueu espatlles amb algú proper",
+            "en": "Bump shoulders with someone nearby"
+        },
         "type": "action"
     },
     {
-        "text": "Chocad los cinco con tres personas distintas",
+        "texts": {
+            "es": "Chocad los cinco con tres personas distintas",
+            "ca": "Piqueu de mans amb tres persones diferents",
+            "en": "High-five three different people"
+        },
         "type": "action"
     },
     {
-        "text": "Imitad el sonido de un animal durante 5 segundos",
+        "texts": {
+            "es": "Imitad el sonido de un animal durante 5 segundos",
+            "ca": "Imiteu el so d'un animal durant 5 segons",
+            "en": "Imitate an animal sound for 5 seconds"
+        },
         "type": "action"
     },
     {
-        "text": "Ordenaos por altura sin hablar",
+        "texts": {
+            "es": "Ordenaos por altura sin hablar",
+            "ca": "Ordeneu-vos per alçada sense parlar",
+            "en": "Line up by height without speaking"
+        },
         "type": "action"
     },
     {
-        "text": "Ordenaos por edad sin hablar",
+        "texts": {
+            "es": "Ordenaos por edad sin hablar",
+            "ca": "Ordeneu-vos per edat sense parlar",
+            "en": "Line up by age without speaking"
+        },
         "type": "action"
     },
     {
-        "text": "Respirad profundo todos a la vez",
+        "texts": {
+            "es": "Respirad profundo todos a la vez",
+            "ca": "Respireu profund tots alhora",
+            "en": "Take a deep breath all at once"
+        },
         "type": "action"
     },
     {
-        "text": "Daos un abrazo incómodo",
+        "texts": {
+            "es": "Daos un abrazo incómodo",
+            "ca": "Feu-vos una abraçada incòmoda",
+            "en": "Give each other an awkward hug"
+        },
         "type": "photo"
     },
     {
-        "text": "Posad saltando… aunque no saltéis",
+        "texts": {
+            "es": "Posad saltando… aunque no saltéis",
+            "ca": "Poseu saltant… encara que no salteu",
+            "en": "Pose as if jumping... even if you don't jump"
+        },
         "type": "photo"
     },
     {
-        "text": "Posad señalando a alguien al azar",
+        "texts": {
+            "es": "Posad señalando a alguien al azar",
+            "ca": "Poseu assenyalant algú a l'atzar",
+            "en": "Pose while pointing at someone random"
+        },
         "type": "photo"
     },
     {
-        "text": "Haced una pose absurda",
+        "texts": {
+            "es": "Haced una pose absurda",
+            "ca": "Feu una pose absurda",
+            "en": "Do an absurd pose"
+        },
         "type": "photo"
     },
     {
-        "text": "Imitad una estatua famosa inventada",
+        "texts": {
+            "es": "Imitad una estatua famosa inventada",
+            "ca": "Imiteu una estàtua famosa inventada",
+            "en": "Imitate an invented famous statue"
+        },
         "type": "photo"
     },
     {
-        "text": "Mostrad una sonrisa real, sin posar",
+        "texts": {
+            "es": "Mostrad una sonrisa real, sin posar",
+            "ca": "Mostreu un somriure real, sense posar",
+            "en": "Show a real smile, no posing"
+        },
         "type": "photo"
     },
     {
-        "text": "Poned cara de póster de película dramática",
+        "texts": {
+            "es": "Poned cara de póster de película dramática",
+            "ca": "Poseu cara de pòster de pel·lícula dramàtica",
+            "en": "Make a dramatic movie-poster face"
+        },
         "type": "photo"
     },
     {
-        "text": "Poned mirada intensa a la persona más cercana",
+        "texts": {
+            "es": "Poned mirada intensa a la persona más cercana",
+            "ca": "Poseu mirada intensa a la persona més propera",
+            "en": "Give an intense look to the nearest person"
+        },
         "type": "photo"
     },
     {
-        "text": "Posad como si acabarais de ganar un premio importante",
+        "texts": {
+            "es": "Posad como si acabarais de ganar un premio importante",
+            "ca": "Poseu com si acabéssiu de guanyar un premi important",
+            "en": "Pose as if you just won an important award"
+        },
         "type": "photo"
     },
     {
-        "text": "Posad como si fuerais una banda de música",
+        "texts": {
+            "es": "Posad como si fuerais una banda de música",
+            "ca": "Poseu com si fóssiu una banda de música",
+            "en": "Pose like you are a music band"
+        },
         "type": "photo"
     },
     {
-        "text": "Comparte algo por lo que estés agradecido ahora mismo",
+        "texts": {
+            "es": "Comparte algo por lo que estés agradecido ahora mismo",
+            "ca": "Compartiu una cosa per la qual estigueu agraïts ara mateix",
+            "en": "Share something you're grateful for right now"
+        },
         "type": "talk"
     },
     {
-        "text": "Contad algo pequeño que te haya hecho sonreír hoy",
+        "texts": {
+            "es": "Contad algo pequeño que te haya hecho sonreír hoy",
+            "ca": "Expliqueu una cosa petita que us hagi fet somriure avui",
+            "en": "Share something small that made you smile today"
+        },
         "type": "talk"
     },
     {
-        "text": "Contad algo que aprendiste recientemente",
+        "texts": {
+            "es": "Contad algo que aprendiste recientemente",
+            "ca": "Expliqueu una cosa que hàgiu après fa poc",
+            "en": "Share something you learned recently"
+        },
         "type": "talk"
     },
     {
-        "text": "Contad un plan sencillo que te haga ilusión",
+        "texts": {
+            "es": "Contad un plan sencillo que te haga ilusión",
+            "ca": "Expliqueu un pla senzill que us faci il·lusió",
+            "en": "Share a simple plan you're excited about"
+        },
         "type": "talk"
     },
     {
-        "text": "Dadle las gracias a alguien del grupo",
+        "texts": {
+            "es": "Dadle las gracias a alguien del grupo",
+            "ca": "Doneu les gràcies a algú del grup",
+            "en": "Thank someone in the group"
+        },
         "type": "talk"
     },
     {
-        "text": "Decid: derecha algo que os guste; izquierda algo que odiéis",
+        "texts": {
+            "es": "Decid: derecha algo que os guste; izquierda algo que odiéis",
+            "ca": "Digueu: dreta una cosa que us agradi; esquerra una que odieu",
+            "en": "Say: right, something you like; left, something you hate"
+        },
         "type": "talk"
     },
     {
-        "text": "Decid algo que te guste de estar aquí hoy",
+        "texts": {
+            "es": "Decid algo que te guste de estar aquí hoy",
+            "ca": "Digueu una cosa que us agradi de ser aquí avui",
+            "en": "Say something you like about being here today"
+        },
         "type": "talk"
     },
     {
-        "text": "Di tu comida favorita y la que menos te gusta",
+        "texts": {
+            "es": "Di tu comida favorita y la que menos te gusta",
+            "ca": "Digueu el vostre menjar preferit i el que menys us agrada",
+            "en": "Say your favorite food and your least favorite one"
+        },
         "type": "talk"
     },
     {
-        "text": "Di una manía rara que tengas",
+        "texts": {
+            "es": "Di una manía rara que tengas",
+            "ca": "Digueu una mania estranya que tingueu",
+            "en": "Say one unusual habit you have"
+        },
         "type": "talk"
     },
     {
-        "text": "Mirad alrededor y nombrad algo bonito que veáis",
+        "texts": {
+            "es": "Mirad alrededor y nombrad algo bonito que veáis",
+            "ca": "Mireu al voltant i anomeneu una cosa bonica que vegeu",
+            "en": "Look around and name something beautiful you see"
+        },
         "type": "talk"
     }
 ]

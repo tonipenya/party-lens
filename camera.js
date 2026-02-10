@@ -33,7 +33,7 @@ class Camera {
     }
 
     takePicture(data) {
-        const { card, video } = data;
+        const { card, video, language } = data;
         if (!card || !video || video.videoWidth === 0 || video.videoHeight === 0) {
             return;
         }
@@ -54,7 +54,7 @@ class Camera {
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `${card.text}.png`;
+            a.download = `${card.texts[language]}.png`;
             a.click();
             URL.revokeObjectURL(url);
         }, "image/png");
