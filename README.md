@@ -6,6 +6,8 @@ A tiny, slightly chaotic party game for one screen and one camera.
 
 Intentionally silly.
 
+Live version: https://tonipenya.github.io/party-lens/
+
 ## What it does
 
 - Starts on click (and asks for fullscreen)
