@@ -3,6 +3,7 @@
     --color-action: #87ceeb;
     --color-talk: #ffd700;
     --color-start: #fff4dc;
+    --color-setup: #d9eadf;
     --color-text: #333;
     --color-blackout: #000;
 }
@@ -47,6 +48,10 @@ body {
     background-color: var(--color-talk);
 }
 
+#container[data-type="setup"] {
+    background-color: var(--color-setup);
+}
+
 .card {
     display: flex;
     flex-direction: column;
@@ -83,6 +88,10 @@ body {
     content: "💬 ";
 }
 
+#container[data-type="setup"] #card-text::before {
+    content: "⚙️ ";
+}
+
 .card.with-photo #card-text {
     font-size: clamp(2rem, 4.5vw, 3.8rem);
     margin-bottom: 3vh;
@@ -102,6 +111,14 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.camera-preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
 }
 
 #overlay {

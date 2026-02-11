@@ -12,6 +12,7 @@ Live version: https://tonipenya.github.io/party-lens/
 
 - Starts on click
 - Toggle fullscreen with `F`
+- Toggle camera setup preview with `S` (press again to return to the game)
 - Loads shuffled prompt cards from `cards.json`
 - Cycles through card types:
     - `action`
@@ -51,6 +52,7 @@ If the pacing feels too polite, lower the intervals in `app.js` and make it mild
 - Camera permission is required.
 - Best experienced on a laptop/tablet facing a group.
 - If fullscreen is blocked by the browser, it still works, just less theatrical.
+- During camera setup preview, the game keeps running in the background.
 
 ## License
 

@@ -1,6 +1,7 @@
 import { Camera } from "./camera.js";
 import { START_CARD, getLanguageFromUrl, keepScreenAwake } from "./env.js";
 import { loadDeck, startGame } from "./game.js";
+import { enableSetupShortcut } from "./setup.js";
 import {
     enableClickToStart,
     enableFullscreenShortcut,
@@ -15,6 +16,7 @@ const camera = new Camera(document.getElementById("overlay"));
 
 showCard({ card: START_CARD }, LANGUAGE);
 enableFullscreenShortcut();
+enableSetupShortcut(camera);
 keepScreenAwake();
 
 enableClickToStart()

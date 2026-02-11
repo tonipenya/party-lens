@@ -1,6 +1,11 @@
 import { getCardText } from "./env.js";
+import { isSetupActive } from "./setup.js";
 
 function showCard(data, language) {
+    if (isSetupActive()) {
+        return data;
+    }
+
     const { card } = data;
     const container = document.getElementById("container");
     const template = document.getElementById("card-template");
@@ -16,6 +21,10 @@ function showCard(data, language) {
 function showCapturedImage(data) {
     const { capturedImageSrc } = data;
     if (!capturedImageSrc) {
+        return data;
+    }
+
+    if (isSetupActive()) {
         return data;
     }
 
@@ -40,12 +49,20 @@ function showCapturedImage(data) {
 }
 
 function turnDisplayOn(data) {
+    if (isSetupActive()) {
+        return data;
+    }
+
     const overlay = document.getElementById("overlay");
     overlay.classList.remove("display-off");
     return data;
 }
 
 function turnDisplayOff(data) {
+    if (isSetupActive()) {
+        return data;
+    }
+
     const overlay = document.getElementById("overlay");
     overlay.classList.add("display-off");
     return data;
