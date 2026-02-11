@@ -41,7 +41,8 @@ function displayNewCard() {
 }
 
 showStartCard();
-bindStartCard()
+enableFullscreenShortcut();
+enableClickToStart()
     .then(turnDisplayOff)
     .then(() => fetch("cards.json"))
     .then((response) => response.json())
@@ -60,9 +61,9 @@ function showStartCard() {
     container.replaceChildren(clone);
 }
 
-function requestFullscreen() {
+function toggleFullscreen() {
     if (document.fullscreenElement) {
-        return Promise.resolve();
+        return document.exitFullscreen?.() ?? Promise.resolve();
     }
     const element = document.documentElement;
     if (element.requestFullscreen) {
@@ -74,17 +75,24 @@ function requestFullscreen() {
     return Promise.resolve();
 }
 
-function bindStartCard() {
+function enableClickToStart() {
     const container = document.getElementById("container");
     return new Promise((resolve) => {
-        container.addEventListener(
-            "click",
-            () => {
-                requestFullscreen()
-                    .catch((error) => console.warn("Fullscreen request failed:", error))
-                    .finally(resolve);
-            },
-            { once: true },
+        container.addEventListener("click", resolve, { once: true });
+    });
+}
+
+function enableFullscreenShortcut() {
+    document.addEventListener("keydown", (event) => {
+        if (event.repeat) {
+            return;
+        }
+        if (event.key.toLowerCase() !== "f") {
+            return;
+        }
+        event.preventDefault();
+        toggleFullscreen().catch((error) =>
+            console.warn("Fullscreen request failed:", error),
         );
     });
 }

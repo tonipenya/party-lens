@@ -10,7 +10,8 @@ Live version: https://tonipenya.github.io/party-lens/
 
 ## What it does
 
-- Starts on click (and asks for fullscreen)
+- Starts on click
+- Toggle fullscreen with `F`
 - Loads shuffled prompt cards from `cards.json`
 - Cycles through card types:
     - `action`
