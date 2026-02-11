@@ -68,6 +68,7 @@ body {
     font-size: clamp(2.5rem, 6vw, 5rem);
     line-height: 1.1;
     font-weight: bold;
+    white-space: pre-line;
 }
 
 #container[data-type="photo"] #card-text::before {
