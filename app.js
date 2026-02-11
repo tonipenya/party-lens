@@ -23,6 +23,7 @@ const CARD_INTERVAL_MAX_MINUTES = 25;
 const FIRST_PICTURE_DELAY = 5000;
 const DELAY_BETWEEN_PICTURES = 2000;
 const camera = new Camera(document.getElementById("overlay"));
+let wakeLock = null;
 
 function displayNewCard() {
     return camera
@@ -43,6 +44,7 @@ function displayNewCard() {
 showStartCard();
 enableFullscreenShortcut();
 enableClickToStart()
+    .then(keepScreenAwake)
     .then(turnDisplayOff)
     .then(() => fetch("cards.json"))
     .then((response) => response.json())
@@ -95,6 +97,10 @@ function enableFullscreenShortcut() {
             console.warn("Fullscreen request failed:", error),
         );
     });
+}
+
+function keepScreenAwake(data) {
+    return requestWakeLock().then(() => data);
 }
 
 async function startAutoDisplay() {
@@ -216,3 +222,31 @@ function delayedExecution(fn, delay) {
 
     return delayedFn;
 }
+
+async function requestWakeLock() {
+    const canRequestWakeLock =
+        "wakeLock" in navigator && document.visibilityState === "visible" && !wakeLock;
+
+    if (!canRequestWakeLock) {
+        return;
+    }
+
+    try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener(
+            "release",
+            () => {
+                wakeLock = null;
+            },
+            { once: true },
+        );
+    } catch (error) {
+        console.warn("Wake lock request failed:", error);
+    }
+}
+
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+        keepScreenAwake();
+    }
+});
