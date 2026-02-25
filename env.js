@@ -21,7 +21,7 @@ const CARD_INTERVAL_START_MINUTES = 10;
 const CARD_INTERVAL_STEP_MINUTES = 2;
 const CARD_INTERVAL_MAX_MINUTES = 25;
 const FIRST_PICTURE_DELAY = 5000;
-const DELAY_BETWEEN_PICTURES = 2000;
+const DELAY_BETWEEN_PICTURES = 3000;
 
 let wakeLock = null;
 let wakeLockListenersBound = false;
@@ -37,9 +37,6 @@ function getLanguageFromUrl() {
 }
 
 function getCardText(card, language) {
-    if (!card) {
-        return "";
-    }
     if (card.texts && typeof card.texts === "object") {
         return card.texts[language] ?? Object.values(card.texts)[0] ?? "";
     }

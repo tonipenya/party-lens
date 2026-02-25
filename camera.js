@@ -34,9 +34,6 @@ class Camera {
 
     takePicture(data) {
         const { card, video, language } = data;
-        if (!card || !video || video.videoWidth === 0 || video.videoHeight === 0) {
-            return;
-        }
 
         this.flashScreen();
 
@@ -49,6 +46,7 @@ class Camera {
 
         canvas.toBlob((blob) => {
             if (!blob) {
+                console.warn("Failed to create image blob for download.");
                 return;
             }
             const url = URL.createObjectURL(blob);
@@ -73,10 +71,6 @@ class Camera {
     }
 
     flashScreen() {
-        if (!this.overlay) {
-            return;
-        }
-
         this.overlay.classList.remove("flash");
         // Force reflow so removing and re-adding the class restarts the CSS animation.
         void this.overlay.offsetWidth;

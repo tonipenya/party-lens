@@ -1,11 +1,6 @@
 import { getCardText } from "./env.js";
-import { isSetupActive } from "./setup.js";
 
 function showCard(data, language) {
-    if (isSetupActive()) {
-        return data;
-    }
-
     const { card } = data;
     const container = document.getElementById("container");
     const template = document.getElementById("card-template");
@@ -14,6 +9,7 @@ function showCard(data, language) {
     clone.getElementById("card-text").textContent = getCardText(card, language);
     container.setAttribute("data-type", card?.type ?? "none");
     container.replaceChildren(clone);
+    turnDisplayOn();
 
     return data;
 }
@@ -24,15 +20,8 @@ function showCapturedImage(data) {
         return data;
     }
 
-    if (isSetupActive()) {
-        return data;
-    }
-
     const card = document.querySelector(".card");
     const template = document.getElementById("captured-image-template");
-    if (!card || !template) {
-        return data;
-    }
 
     const existingContainer = card.querySelector(".captured-photo-container");
     if (existingContainer) {
@@ -48,21 +37,33 @@ function showCapturedImage(data) {
     return data;
 }
 
-function turnDisplayOn(data) {
-    if (isSetupActive()) {
-        return data;
-    }
+function showSetup(video) {
+    const container = document.getElementById("container");
+    const template = document.getElementById("card-template");
 
+    const clone = template.content.cloneNode(true);
+    const card = clone.querySelector(".card");
+    const title = clone.getElementById("card-text");
+
+    title.textContent = "Camera setup";
+    card.classList.add("with-photo");
+
+    const previewContainer = document.createElement("div");
+    previewContainer.className = "captured-photo-container";
+    previewContainer.replaceChildren(video);
+    card.appendChild(previewContainer);
+
+    container.setAttribute("data-type", "setup");
+    container.replaceChildren(clone);
+}
+
+function turnDisplayOn(data) {
     const overlay = document.getElementById("overlay");
     overlay.classList.remove("display-off");
     return data;
 }
 
 function turnDisplayOff(data) {
-    if (isSetupActive()) {
-        return data;
-    }
-
     const overlay = document.getElementById("overlay");
     overlay.classList.add("display-off");
     return data;
@@ -82,33 +83,10 @@ function toggleFullscreen() {
     return Promise.resolve();
 }
 
-function enableFullscreenShortcut() {
-    document.addEventListener("keydown", (event) => {
-        if (event.repeat) {
-            return;
-        }
-        if (event.key.toLowerCase() !== "f") {
-            return;
-        }
-        event.preventDefault();
-        toggleFullscreen().catch((error) =>
-            console.warn("Fullscreen request failed:", error),
-        );
-    });
-}
-
-function enableClickToStart() {
-    const container = document.getElementById("container");
-    return new Promise((resolve) => {
-        container.addEventListener("click", resolve, { once: true });
-    });
-}
-
 export {
-    enableClickToStart,
-    enableFullscreenShortcut,
     showCapturedImage,
     showCard,
+    showSetup,
     toggleFullscreen,
     turnDisplayOff,
     turnDisplayOn,

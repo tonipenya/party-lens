@@ -41,18 +41,18 @@ Then open:
 ## Tweak it
 
 - Prompt content: `cards.json`
-- Timing + flow logic: `app.js`
+- Timing + flow logic: `game.js`
 - Camera behavior: `camera.js`
 - Styles: `style.css`
 
-If the pacing feels too polite, lower the intervals in `app.js` and make it mildly unhinged.
+If the pacing feels too polite, lower the intervals in `env.js` and make it mildly unhinged.
 
 ## Notes
 
 - Camera permission is required.
 - Best experienced on a laptop/tablet facing a group.
 - If fullscreen is blocked by the browser, it still works, just less theatrical.
-- During camera setup preview, the game keeps running in the background.
+- During camera setup preview, regular rounds are paused until you exit setup.
 
 ## License
 
