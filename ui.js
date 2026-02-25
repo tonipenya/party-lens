@@ -1,12 +1,25 @@
 import { getCardText } from "./env.js";
 
+function createCardClone(text = "") {
+    const template = document.getElementById("card-template");
+    const clone = template.content.cloneNode(true);
+    clone.getElementById("card-text").textContent = text;
+    return clone;
+}
+
+function replaceWithTemplate(container, templateId) {
+    const template = document.getElementById(templateId);
+    const type = template.dataset.containerType;
+    if (type) {
+        container.setAttribute("data-type", type);
+    }
+    container.replaceChildren(template.content.cloneNode(true));
+}
+
 function showCard(data, language) {
     const { card } = data;
     const container = document.getElementById("container");
-    const template = document.getElementById("card-template");
-
-    const clone = template.content.cloneNode(true);
-    clone.getElementById("card-text").textContent = getCardText(card, language);
+    const clone = createCardClone(getCardText(card, language));
     container.setAttribute("data-type", card?.type ?? "none");
     container.replaceChildren(clone);
 
@@ -38,32 +51,24 @@ function showCapturedImage(data) {
 
 function showSetup(video) {
     const container = document.getElementById("container");
-    const template = document.getElementById("card-template");
-
-    const clone = template.content.cloneNode(true);
-    const card = clone.querySelector(".card");
-    const title = clone.getElementById("card-text");
-
-    title.textContent = "Camera setup";
-    card.classList.add("with-photo");
-
-    const previewContainer = document.createElement("div");
-    previewContainer.className = "captured-photo-container";
+    replaceWithTemplate(container, "setup-card-template");
+    const previewContainer = container.querySelector(".captured-photo-container");
     previewContainer.replaceChildren(video);
-    card.appendChild(previewContainer);
-
-    container.setAttribute("data-type", "setup");
-    container.replaceChildren(clone);
 }
 
 function showIdle(data) {
     const container = document.getElementById("container");
-    const template = document.getElementById("card-template");
-    const clone = template.content.cloneNode(true);
-    clone.getElementById("card-text").textContent = "";
+    const clone = createCardClone();
 
     container.setAttribute("data-type", "idle");
     container.replaceChildren(clone);
+
+    return data;
+}
+
+function showPause(data) {
+    const container = document.getElementById("container");
+    replaceWithTemplate(container, "pause-card-template");
 
     return data;
 }
@@ -86,6 +91,7 @@ export {
     showCapturedImage,
     showCard,
     showIdle,
+    showPause,
     showSetup,
     toggleFullscreen,
 };

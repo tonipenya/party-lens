@@ -1,32 +1,33 @@
-# Party Lens
+# Party Lens 🎉
 
 A tiny, slightly chaotic party game for one screen and one camera.
 
 `Party Lens` shows random group prompts, turns the screen on/off dramatically, and snaps a few surprise photos along the way.
 
-Intentionally silly.
+Intentionally silly 🤪.
 
 Live version: https://tonipenya.github.io/party-lens/
 
 ## What it does
 
-- Starts on click
-- Toggle fullscreen with `F`
-- Toggle camera setup preview with `S` (press again to return to the game)
-- Loads shuffled prompt cards from `cards.json`
+- Starts on click.
+- Toggle fullscreen with `F`.
+- Toggle camera setup preview with `S` (press again to return to the game).
+- Toggle pause screen with `P` (press again to return to the game).
+- Loads shuffled prompt cards from `cards.json`.
 - Cycles through card types:
     - `action`
     - `photo`
     - `talk`
-- For each round, takes 3 camera pictures with short delays
-- Supports 3 languages via URL param:
+- For each round, it takes three camera pictures with short delays 📸.
+- Supports three languages via URL parameter 🌍:
     - `?lang=en`
     - `?lang=es`
     - `?lang=ca`
 
 ## Run it locally
 
-Because this uses camera + `fetch`, run it from a local server (not `file://`).
+Because this uses camera access and `fetch`, run it from a local server (not `file://`) ⚠️.
 
 ```bash
 # from project root
@@ -49,10 +50,10 @@ If the pacing feels too polite, lower the intervals in `env.js` and make it mild
 
 ## Notes
 
-- Camera permission is required.
+- Camera permission is required ✅.
 - Best experienced on a laptop/tablet facing a group.
 - If fullscreen is blocked by the browser, it still works, just less theatrical.
-- During camera setup preview, regular rounds are paused until you exit setup.
+- During camera setup preview and the pause screen, regular rounds are paused until you exit.
 
 ## License
 

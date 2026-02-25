@@ -6,6 +6,9 @@
     --color-setup: #d9eadf;
     --color-text: #333;
     --color-blackout: #000;
+    --color-pause: #000;
+    --color-pause-symbol: #1a1a1a;
+    --color-pause-bars: #272727;
 }
 
 * {
@@ -56,6 +59,10 @@ body {
     background-color: var(--color-blackout);
 }
 
+#container[data-type="pause"] {
+    background-color: var(--color-pause);
+}
+
 .card {
     display: flex;
     flex-direction: column;
@@ -99,6 +106,29 @@ body {
 .card.with-photo #card-text {
     font-size: clamp(2rem, 4.5vw, 3.8rem);
     margin-bottom: 3vh;
+}
+
+.card.pause-card {
+    width: 100vw;
+    min-height: 100vh;
+}
+
+.pause-symbol {
+    width: min(66vw, 66vh);
+    height: min(66vw, 66vh);
+    border-radius: 50%;
+    background: var(--color-pause-symbol);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(5vw, 7vmin, 7vw);
+}
+
+.pause-symbol-bar {
+    width: min(6vw, 6vh);
+    height: min(25vw, 25vh);
+    border-radius: 999px;
+    background: var(--color-pause-bars);
 }
 
 .captured-photo-container {

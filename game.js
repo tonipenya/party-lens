@@ -11,6 +11,7 @@ import {
     showCapturedImage,
     showCard,
     showIdle,
+    showPause,
     showSetup,
     toggleFullscreen,
 } from "./ui.js";
@@ -21,17 +22,19 @@ const State = Object.freeze({
     ACTIVITY: "activity",
     ENDED: "ended",
     SETUP: "setup",
+    PAUSED: "paused",
 });
 
 const Trigger = Object.freeze({
     CLICK: "click",
     KEY_FULLSCREEN: "key_fullscreen",
     KEY_SETUP: "key_setup",
+    KEY_PAUSE: "key_pause",
     TIMER_ACTIVITY: "timer_activity",
     ACTIVITY_COMPLETED: "activity_completed",
 });
 
-const SETUP_TIMER_RETRY_MS = 1000;
+const SETUP_OR_PAUSE_TIMER_RETRY_MS = 1000;
 
 class NoneCommand {}
 class ToggleFullscreenCommand {}
@@ -42,6 +45,12 @@ class ScheduleActivityCommand {
 }
 class EnterSetupCommand {}
 class ExitSetupCommand {
+    constructor(previousState) {
+        this.previousState = previousState;
+    }
+}
+class EnterPauseCommand {}
+class ExitPauseCommand {
     constructor(previousState) {
         this.previousState = previousState;
     }
@@ -71,15 +80,31 @@ class GameMachine {
                 return new ExitSetupCommand(this.state);
             }
 
-            if (this.canEnterSetup()) {
+            if (this.canBeInterrupted()) {
                 this.previousState = this.state;
                 this.state = State.SETUP;
                 return new EnterSetupCommand();
             }
         }
 
-        if (trigger === Trigger.TIMER_ACTIVITY && this.state === State.SETUP) {
-            return new ScheduleActivityCommand(SETUP_TIMER_RETRY_MS);
+        if (trigger === Trigger.KEY_PAUSE) {
+            if (this.state === State.PAUSED) {
+                this.state = this.previousState;
+                return new ExitPauseCommand(this.state);
+            }
+
+            if (this.canBeInterrupted()) {
+                this.previousState = this.state;
+                this.state = State.PAUSED;
+                return new EnterPauseCommand();
+            }
+        }
+
+        if (
+            trigger === Trigger.TIMER_ACTIVITY &&
+            (this.state === State.SETUP || this.state === State.PAUSED)
+        ) {
+            return new ScheduleActivityCommand(SETUP_OR_PAUSE_TIMER_RETRY_MS);
         }
 
         if (trigger === Trigger.TIMER_ACTIVITY && this.state === State.IDLE) {
@@ -99,7 +124,7 @@ class GameMachine {
         return new NoneCommand();
     }
 
-    canEnterSetup() {
+    canBeInterrupted() {
         return (
             this.state === State.NOT_STARTED ||
             this.state === State.IDLE ||
@@ -147,6 +172,11 @@ class GameController {
             if (key === "s") {
                 event.preventDefault();
                 this.execute(this.machine.nextCommand(Trigger.KEY_SETUP));
+                return;
+            }
+            if (key === "p") {
+                event.preventDefault();
+                this.execute(this.machine.nextCommand(Trigger.KEY_PAUSE));
             }
         });
     }
@@ -169,6 +199,12 @@ class GameController {
                     return;
                 case ExitSetupCommand:
                     this.exitSetup(command.previousState);
+                    return;
+                case EnterPauseCommand:
+                    this.enterPause();
+                    return;
+                case ExitPauseCommand:
+                    this.exitPause(command.previousState);
                     return;
                 case RunActivityCommand:
                     try {
@@ -222,7 +258,19 @@ class GameController {
 
     exitSetup(previousState) {
         this.camera.stopCamera();
+        this.restoreViewFromPreviousState(previousState);
+    }
 
+    enterPause() {
+        this.clearTimer();
+        showPause();
+    }
+
+    exitPause(previousState) {
+        this.restoreViewFromPreviousState(previousState);
+    }
+
+    restoreViewFromPreviousState(previousState) {
         if (previousState === State.IDLE) {
             showIdle();
             this.scheduleActivity();
@@ -279,6 +327,11 @@ class GameController {
         if (this.machine.state === State.SETUP) {
             this.machine.state = this.machine.previousState;
             this.exitSetup(this.machine.previousState);
+            return;
+        }
+        if (this.machine.state === State.PAUSED) {
+            this.machine.state = this.machine.previousState;
+            this.exitPause(this.machine.previousState);
             return;
         }
 
