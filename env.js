@@ -15,13 +15,23 @@ const END_CARD = {
         ca: "No queden targetes!",
     },
 };
+const BURST_PHOTO_CARD = {
+    type: "burst_photo",
+    texts: {
+        en: "Photo burst mode",
+        es: "Modo ráfaga de fotos",
+        ca: "Mode ràfega de fotos",
+    },
+};
 
 // Times in milliseconds.
-const CARD_INTERVAL_START_MINUTES = 10;
-const CARD_INTERVAL_STEP_MINUTES = 2;
-const CARD_INTERVAL_MAX_MINUTES = 25;
-const FIRST_PICTURE_DELAY = 5000;
-const DELAY_BETWEEN_PICTURES = 3000;
+const ACTIVITY_START_DELAY = 10 * 60 * 1000;
+const ACTIVITY_STEP_DELAY = 2 * 60 * 1000;
+const ACTIVITY_MAX_DELAY = 25 * 60 * 1000;
+const FIRST_SHOT_DELAY = 5 * 1000;
+const DELAY_BETWEEN_PICTURES = 3 * 1000;
+const BURST_SHOW_DELAY = 3 * 1000;
+const DELAY_BETWEEN_BURST_SHOTS = 2 * 60 * 1000;
 
 let wakeLock = null;
 let wakeLockListenersBound = false;
@@ -88,12 +98,15 @@ function keepScreenAwake(data) {
 }
 
 export {
-    CARD_INTERVAL_MAX_MINUTES,
-    CARD_INTERVAL_START_MINUTES,
-    CARD_INTERVAL_STEP_MINUTES,
+    ACTIVITY_MAX_DELAY,
+    ACTIVITY_START_DELAY,
+    ACTIVITY_STEP_DELAY,
+    BURST_PHOTO_CARD,
+    BURST_SHOW_DELAY,
+    DELAY_BETWEEN_BURST_SHOTS,
     DELAY_BETWEEN_PICTURES,
     END_CARD,
-    FIRST_PICTURE_DELAY,
+    FIRST_SHOT_DELAY,
     getCardText,
     getLanguageFromUrl,
     keepScreenAwake,

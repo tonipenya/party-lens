@@ -29,6 +29,10 @@ class Camera {
         });
 
         await video.play();
+
+        // Let autofocus and autoexposure settle before taking the picture.
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
         return { card: null, video };
     }
 

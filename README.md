@@ -14,12 +14,14 @@ Live version: https://tonipenya.github.io/party-lens/
 - Toggle fullscreen with `F`.
 - Toggle camera setup preview with `S` (press again to return to the game).
 - Toggle pause screen with `P` (press again to return to the game).
+- Toggle continuous burst-photo mode with `B` (press again to return to the game).
 - Loads shuffled prompt cards from `cards.json`.
 - Cycles through card types:
     - `action`
     - `photo`
     - `talk`
 - For each round, it takes three camera pictures with short delays 📸.
+- In burst-photo mode, it takes pictures continuously: show capture briefly, hide, wait 2 minutes, repeat.
 - Supports three languages via URL parameter 🌍:
     - `?lang=en`
     - `?lang=es`
@@ -53,7 +55,7 @@ If the pacing feels too polite, lower the intervals in `env.js` and make it mild
 - Camera permission is required ✅.
 - Best experienced on a laptop/tablet facing a group.
 - If fullscreen is blocked by the browser, it still works, just less theatrical.
-- During camera setup preview and the pause screen, regular rounds are paused until you exit.
+- During camera setup preview, the pause screen, and burst-photo mode, regular rounds are paused until you exit.
 
 ## License
 

@@ -49,6 +49,19 @@ function showCapturedImage(data) {
     return data;
 }
 
+function hideCapturedImage() {
+    const card = document.querySelector(".card");
+    if (!card) {
+        return;
+    }
+
+    const existingContainer = card.querySelector(".captured-photo-container");
+    if (existingContainer) {
+        existingContainer.remove();
+    }
+    card.classList.remove("with-photo");
+}
+
 function showSetup(video) {
     const container = document.getElementById("container");
     replaceWithTemplate(container, "setup-card-template");
@@ -56,21 +69,17 @@ function showSetup(video) {
     previewContainer.replaceChildren(video);
 }
 
-function showIdle(data) {
+function showIdle() {
     const container = document.getElementById("container");
     const clone = createCardClone();
 
     container.setAttribute("data-type", "idle");
     container.replaceChildren(clone);
-
-    return data;
 }
 
-function showPause(data) {
+function showPause() {
     const container = document.getElementById("container");
     replaceWithTemplate(container, "pause-card-template");
-
-    return data;
 }
 
 function toggleFullscreen() {
@@ -88,6 +97,7 @@ function toggleFullscreen() {
 }
 
 export {
+    hideCapturedImage,
     showCapturedImage,
     showCard,
     showIdle,

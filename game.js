@@ -1,13 +1,17 @@
 import {
-    CARD_INTERVAL_MAX_MINUTES,
-    CARD_INTERVAL_START_MINUTES,
-    CARD_INTERVAL_STEP_MINUTES,
+    ACTIVITY_MAX_DELAY,
+    ACTIVITY_START_DELAY,
+    ACTIVITY_STEP_DELAY,
+    BURST_PHOTO_CARD,
+    BURST_SHOW_DELAY,
+    DELAY_BETWEEN_BURST_SHOTS,
     DELAY_BETWEEN_PICTURES,
     END_CARD,
-    FIRST_PICTURE_DELAY,
+    FIRST_SHOT_DELAY,
     START_CARD,
 } from "./env.js";
 import {
+    hideCapturedImage,
     showCapturedImage,
     showCard,
     showIdle,
@@ -20,6 +24,8 @@ const State = Object.freeze({
     NOT_STARTED: "not_started",
     IDLE: "idle",
     ACTIVITY: "activity",
+    BURST_PHOTO: "burst_photo",
+    BURST_IDLE: "burst_idle",
     ENDED: "ended",
     SETUP: "setup",
     PAUSED: "paused",
@@ -30,17 +36,21 @@ const Trigger = Object.freeze({
     KEY_FULLSCREEN: "key_fullscreen",
     KEY_SETUP: "key_setup",
     KEY_PAUSE: "key_pause",
+    KEY_BURST_PHOTO: "key_burst_photo",
     TIMER_ACTIVITY: "timer_activity",
+    BURST_PICTURE_TAKEN: "burst_picture_taken",
+    TIMER_BURST: "timer_burst",
     ACTIVITY_COMPLETED: "activity_completed",
 });
 
-const SETUP_OR_PAUSE_TIMER_RETRY_MS = 1000;
+const INTERRUPT_RETRY_DELAY = 1000;
 
 class NoneCommand {}
 class ToggleFullscreenCommand {}
-class ScheduleActivityCommand {
-    constructor(delayMs) {
-        this.delayMs = delayMs;
+class ScheduleCommand {
+    constructor(trigger, delay) {
+        this.trigger = trigger;
+        this.delay = delay;
     }
 }
 class EnterSetupCommand {}
@@ -56,12 +66,18 @@ class ExitPauseCommand {
     }
 }
 class RunActivityCommand {}
+class ShowBurstCommand {}
+class EndBurstCommand {
+    constructor(previousState) {
+        this.previousState = previousState;
+    }
+}
 
 class GameMachine {
     constructor() {
         this.state = State.NOT_STARTED;
         this.previousState = State.NOT_STARTED;
-        this.intervalMinutes = CARD_INTERVAL_START_MINUTES;
+        this.activityDelay = ACTIVITY_START_DELAY;
     }
 
     nextCommand(trigger) {
@@ -71,7 +87,7 @@ class GameMachine {
 
         if (trigger === Trigger.CLICK && this.state === State.NOT_STARTED) {
             this.state = State.IDLE;
-            return new ScheduleActivityCommand(0);
+            return new ScheduleCommand(Trigger.TIMER_ACTIVITY, 0);
         }
 
         if (trigger === Trigger.KEY_SETUP) {
@@ -93,18 +109,44 @@ class GameMachine {
                 return new ExitPauseCommand(this.state);
             }
 
-            if (this.canBeInterrupted()) {
+            if (this.canBeInterrupted() || this.state === State.BURST_IDLE) {
                 this.previousState = this.state;
                 this.state = State.PAUSED;
                 return new EnterPauseCommand();
             }
         }
 
+        if (trigger === Trigger.KEY_BURST_PHOTO) {
+            if (this.state === State.BURST_PHOTO || this.state === State.BURST_IDLE) {
+                this.state = this.previousState;
+                return new EndBurstCommand(this.state);
+            }
+
+            if (this.canBeInterrupted()) {
+                this.previousState = this.state;
+                this.state = State.BURST_PHOTO;
+                return new ShowBurstCommand();
+            }
+        }
+
+        if (
+            trigger === Trigger.BURST_PICTURE_TAKEN &&
+            this.state === State.BURST_PHOTO
+        ) {
+            this.state = State.BURST_IDLE;
+            return new ScheduleCommand(Trigger.TIMER_BURST, DELAY_BETWEEN_BURST_SHOTS);
+        }
+
+        if (trigger === Trigger.TIMER_BURST && this.state === State.BURST_IDLE) {
+            this.state = State.BURST_PHOTO;
+            return new ShowBurstCommand();
+        }
+
         if (
             trigger === Trigger.TIMER_ACTIVITY &&
             (this.state === State.SETUP || this.state === State.PAUSED)
         ) {
-            return new ScheduleActivityCommand(SETUP_OR_PAUSE_TIMER_RETRY_MS);
+            return new ScheduleCommand(Trigger.TIMER_ACTIVITY, INTERRUPT_RETRY_DELAY);
         }
 
         if (trigger === Trigger.TIMER_ACTIVITY && this.state === State.IDLE) {
@@ -113,12 +155,12 @@ class GameMachine {
         }
 
         if (trigger === Trigger.ACTIVITY_COMPLETED && this.state === State.ACTIVITY) {
-            this.intervalMinutes = Math.min(
-                this.intervalMinutes + CARD_INTERVAL_STEP_MINUTES,
-                CARD_INTERVAL_MAX_MINUTES,
+            this.activityDelay = Math.min(
+                this.activityDelay + ACTIVITY_STEP_DELAY,
+                ACTIVITY_MAX_DELAY,
             );
             this.state = State.IDLE;
-            return new ScheduleActivityCommand(this.intervalMinutes * 60 * 1000);
+            return new ScheduleCommand(Trigger.TIMER_ACTIVITY, this.activityDelay);
         }
 
         return new NoneCommand();
@@ -177,6 +219,11 @@ class GameController {
             if (key === "p") {
                 event.preventDefault();
                 this.execute(this.machine.nextCommand(Trigger.KEY_PAUSE));
+                return;
+            }
+            if (key === "b") {
+                event.preventDefault();
+                this.execute(this.machine.nextCommand(Trigger.KEY_BURST_PHOTO));
             }
         });
     }
@@ -191,8 +238,8 @@ class GameController {
                         console.warn("Fullscreen request failed:", error),
                     );
                     return;
-                case ScheduleActivityCommand:
-                    this.scheduleActivity(command.delayMs);
+                case ScheduleCommand:
+                    this.schedule(command.trigger, command.delay);
                     return;
                 case EnterSetupCommand:
                     await this.enterSetup();
@@ -207,12 +254,13 @@ class GameController {
                     this.exitPause(command.previousState);
                     return;
                 case RunActivityCommand:
-                    try {
-                        await this.runActivity();
-                    } catch (error) {
-                        // Reschedule task to avoid leaving the game in a broken state
-                        await this.recoverFromActivityFailure();
-                    }
+                    await this.runActivity();
+                    return;
+                case ShowBurstCommand:
+                    await this.showBurst();
+                    return;
+                case EndBurstCommand:
+                    this.endBurst(command.previousState);
                     return;
                 default:
                     console.warn("Unknown command:", command);
@@ -220,7 +268,7 @@ class GameController {
             }
         } catch (error) {
             console.error("Command execution failed:", error);
-            this.recoverFromFailure();
+            await this.recover();
         }
     }
 
@@ -237,7 +285,7 @@ class GameController {
         const data = { card, language: this.language, video };
         showCard(data, this.language);
 
-        await this.captureAfterDelay(data, FIRST_PICTURE_DELAY);
+        await this.captureAfterDelay(data, FIRST_SHOT_DELAY);
         await this.captureAfterDelay(data, DELAY_BETWEEN_PICTURES);
         await this.captureAfterDelay(data, DELAY_BETWEEN_PICTURES);
 
@@ -246,6 +294,21 @@ class GameController {
 
         showIdle();
         await this.execute(this.machine.nextCommand(Trigger.ACTIVITY_COMPLETED));
+    }
+
+    async showBurst() {
+        this.clearTimer();
+
+        const { video } = await this.camera.startCamera();
+        const data = { card: BURST_PHOTO_CARD, language: this.language, video };
+        showCard(data, this.language);
+        this.camera.takePicture(data);
+        showCapturedImage(data);
+        await this.wait(BURST_SHOW_DELAY);
+        hideCapturedImage();
+        this.camera.stopCamera(data);
+        showIdle();
+        await this.execute(this.machine.nextCommand(Trigger.BURST_PICTURE_TAKEN));
     }
 
     async enterSetup() {
@@ -270,10 +333,23 @@ class GameController {
         this.restoreViewFromPreviousState(previousState);
     }
 
+    endBurst(previousState) {
+        this.clearTimer();
+        this.camera.stopCamera();
+        hideCapturedImage();
+        this.restoreViewFromPreviousState(previousState);
+    }
+
     restoreViewFromPreviousState(previousState) {
         if (previousState === State.IDLE) {
             showIdle();
-            this.scheduleActivity();
+            this.schedule(Trigger.TIMER_ACTIVITY, this.machine.activityDelay);
+            return;
+        }
+
+        if (previousState === State.BURST_IDLE) {
+            showIdle();
+            this.schedule(Trigger.TIMER_BURST, DELAY_BETWEEN_BURST_SHOTS);
             return;
         }
 
@@ -287,8 +363,8 @@ class GameController {
         }
     }
 
-    async captureAfterDelay(data, delayMs) {
-        await this.wait(delayMs);
+    async captureAfterDelay(data, delay) {
+        await this.wait(delay);
         this.camera.takePicture(data);
         showCapturedImage(data);
     }
@@ -300,42 +376,47 @@ class GameController {
         this.deck = deck.sort(() => Math.random() - 0.5);
     }
 
-    async recoverFromActivityFailure() {
-        if (this.machine.state !== State.ACTIVITY) {
+    async recover() {
+        const state = this.machine.state;
+
+        if (state === State.ACTIVITY) {
+            this.camera.stopCamera();
+            showIdle();
+            await this.execute(this.machine.nextCommand(Trigger.ACTIVITY_COMPLETED));
+            return;
+        }
+
+        if (state === State.BURST_PHOTO || state === State.BURST_IDLE) {
+            this.clearTimer();
+            this.camera.stopCamera();
+            hideCapturedImage();
+            this.machine.state = State.BURST_IDLE;
+            this.schedule(Trigger.TIMER_BURST, INTERRUPT_RETRY_DELAY);
             return;
         }
 
         this.camera.stopCamera();
-        showIdle();
-        await this.execute(this.machine.nextCommand(Trigger.ACTIVITY_COMPLETED));
-    }
-
-    recoverFromFailure() {
         this.clearTimer();
-        this.camera.stopCamera();
 
-        if (
-            this.machine.state === State.IDLE ||
-            this.machine.state === State.ACTIVITY
-        ) {
+        if (state === State.IDLE) {
             this.machine.state = State.IDLE;
             showIdle();
-            this.scheduleActivity();
+            this.schedule(Trigger.TIMER_ACTIVITY, this.machine.activityDelay);
             return;
         }
 
-        if (this.machine.state === State.SETUP) {
+        if (state === State.SETUP) {
             this.machine.state = this.machine.previousState;
             this.exitSetup(this.machine.previousState);
             return;
         }
-        if (this.machine.state === State.PAUSED) {
+        if (state === State.PAUSED) {
             this.machine.state = this.machine.previousState;
             this.exitPause(this.machine.previousState);
             return;
         }
 
-        if (this.machine.state === State.ENDED) {
+        if (state === State.ENDED) {
             showCard({ card: END_CARD }, this.language);
             return;
         }
@@ -344,24 +425,22 @@ class GameController {
         showCard({ card: START_CARD }, this.language);
     }
 
-    scheduleActivity(delayMs = this.machine.intervalMinutes * 60 * 1000) {
-        this.setTimer(delayMs, () =>
-            this.execute(this.machine.nextCommand(Trigger.TIMER_ACTIVITY)),
-        );
+    schedule(trigger, delay) {
+        this.setTimer(delay, () => this.execute(this.machine.nextCommand(trigger)));
     }
 
-    wait(delayMs) {
+    wait(delay) {
         return new Promise((resolve) => {
-            this.setTimer(delayMs, resolve);
+            this.setTimer(delay, resolve);
         });
     }
 
-    setTimer(delayMs, callback) {
+    setTimer(delay, callback) {
         this.clearTimer();
         this.timerId = setTimeout(() => {
             this.timerId = null;
             callback();
-        }, delayMs);
+        }, delay);
     }
 
     clearTimer() {

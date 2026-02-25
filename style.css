@@ -3,6 +3,7 @@
     --color-action: #87ceeb;
     --color-talk: #ffd700;
     --color-start: #fff4dc;
+    --color-burst-photo: #ffcf99;
     --color-setup: #d9eadf;
     --color-text: #333;
     --color-blackout: #000;
@@ -51,6 +52,10 @@ body {
     background-color: var(--color-talk);
 }
 
+#container[data-type="burst_photo"] {
+    background-color: var(--color-burst-photo);
+}
+
 #container[data-type="setup"] {
     background-color: var(--color-setup);
 }
@@ -97,6 +102,10 @@ body {
 
 #container[data-type="talk"] #card-text::before {
     content: "💬 ";
+}
+
+#container[data-type="burst_photo"] #card-text::before {
+    content: "⏱️ ";
 }
 
 #container[data-type="setup"] #card-text::before {
