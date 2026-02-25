@@ -9,7 +9,6 @@ function showCard(data, language) {
     clone.getElementById("card-text").textContent = getCardText(card, language);
     container.setAttribute("data-type", card?.type ?? "none");
     container.replaceChildren(clone);
-    turnDisplayOn();
 
     return data;
 }
@@ -57,15 +56,15 @@ function showSetup(video) {
     container.replaceChildren(clone);
 }
 
-function turnDisplayOn(data) {
-    const overlay = document.getElementById("overlay");
-    overlay.classList.remove("display-off");
-    return data;
-}
+function showIdle(data) {
+    const container = document.getElementById("container");
+    const template = document.getElementById("card-template");
+    const clone = template.content.cloneNode(true);
+    clone.getElementById("card-text").textContent = "";
 
-function turnDisplayOff(data) {
-    const overlay = document.getElementById("overlay");
-    overlay.classList.add("display-off");
+    container.setAttribute("data-type", "idle");
+    container.replaceChildren(clone);
+
     return data;
 }
 
@@ -86,8 +85,7 @@ function toggleFullscreen() {
 export {
     showCapturedImage,
     showCard,
+    showIdle,
     showSetup,
     toggleFullscreen,
-    turnDisplayOff,
-    turnDisplayOn,
 };

@@ -52,6 +52,10 @@ body {
     background-color: var(--color-setup);
 }
 
+#container[data-type="idle"] {
+    background-color: var(--color-blackout);
+}
+
 .card {
     display: flex;
     flex-direction: column;
@@ -125,15 +129,8 @@ body {
     position: fixed;
     inset: 0;
     background-color: rgb(0 0 0 / 0%);
-    transition: background-color 300ms ease;
     pointer-events: none;
     z-index: 1000;
-}
-
-#overlay.display-off {
-    background-color: var(--color-blackout);
-    transition: background-color 1s ease;
-    pointer-events: auto;
 }
 
 #overlay.flash {

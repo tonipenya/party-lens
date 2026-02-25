@@ -10,10 +10,9 @@ import {
 import {
     showCapturedImage,
     showCard,
+    showIdle,
     showSetup,
     toggleFullscreen,
-    turnDisplayOff,
-    turnDisplayOn,
 } from "./ui.js";
 
 const State = Object.freeze({
@@ -209,7 +208,7 @@ class GameController {
         this.camera.stopCamera(data);
         await this.wait(DELAY_BETWEEN_PICTURES);
 
-        turnDisplayOff();
+        showIdle();
         await this.execute(this.machine.nextCommand(Trigger.ACTIVITY_COMPLETED));
     }
 
@@ -219,13 +218,13 @@ class GameController {
         const { video } = await this.camera.startCamera();
         video.classList.add("camera-preview");
         showSetup(video);
-        turnDisplayOn();
     }
 
     exitSetup(previousState) {
         this.camera.stopCamera();
 
         if (previousState === State.IDLE) {
+            showIdle();
             this.scheduleActivity();
             return;
         }
@@ -259,7 +258,7 @@ class GameController {
         }
 
         this.camera.stopCamera();
-        turnDisplayOff();
+        showIdle();
         await this.execute(this.machine.nextCommand(Trigger.ACTIVITY_COMPLETED));
     }
 
@@ -272,6 +271,7 @@ class GameController {
             this.machine.state === State.ACTIVITY
         ) {
             this.machine.state = State.IDLE;
+            showIdle();
             this.scheduleActivity();
             return;
         }
