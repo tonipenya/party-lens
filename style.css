@@ -8,8 +8,9 @@
     --color-text: #333;
     --color-blackout: #000;
     --color-pause: #000;
-    --color-pause-symbol: #1a1a1a;
-    --color-pause-bars: #272727;
+    --color-pause-symbol: #222;
+    --color-pause-bars: #3a3a3a;
+    --color-pause-help: rgb(255 255 255 / 60%);
 }
 
 * {
@@ -120,6 +121,9 @@ body {
 .card.pause-card {
     width: 100vw;
     min-height: 100vh;
+    justify-content: center;
+    position: relative;
+    padding: 0 4vw;
 }
 
 .pause-symbol {
@@ -138,6 +142,18 @@ body {
     height: min(25vw, 25vh);
     border-radius: 999px;
     background: var(--color-pause-bars);
+}
+
+.pause-help {
+    position: absolute;
+    bottom: 3vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(0.72rem, 1.4vw, 0.95rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-pause-help);
+    white-space: nowrap;
 }
 
 .captured-photo-container {
