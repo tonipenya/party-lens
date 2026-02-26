@@ -189,6 +189,8 @@ class GameController {
         this.machine = new GameMachine();
         this.deck = [];
         this.timerId = null;
+        this.pendingTimer = null;
+        this.heldActivityDelay = null;
     }
 
     async mount() {
@@ -321,7 +323,7 @@ class GameController {
 
     async showBurst() {
         log.info("starting burst photo step");
-        this.clearTimer();
+        this.holdActivityTimer();
 
         const { video } = await this.camera.startCamera();
         const data = { card: BURST_PHOTO_CARD, language: this.language, video };
@@ -337,7 +339,7 @@ class GameController {
 
     async enterSetup() {
         log.info("entering setup mode");
-        this.clearTimer();
+        this.holdActivityTimer();
 
         const { video } = await this.camera.startCamera();
         video.classList.add("camera-preview");
@@ -352,7 +354,7 @@ class GameController {
 
     enterPause() {
         log.info("entering pause mode");
-        this.clearTimer();
+        this.holdActivityTimer();
         showPause();
     }
 
@@ -372,7 +374,7 @@ class GameController {
     restoreViewFromPreviousState(previousState) {
         if (previousState === State.IDLE) {
             showIdle();
-            this.schedule(Trigger.TIMER_ACTIVITY, this.machine.activityDelay);
+            this.continueHeldActivityTimer();
             return;
         }
 
@@ -433,7 +435,7 @@ class GameController {
         if (state === State.IDLE) {
             this.machine.state = State.IDLE;
             showIdle();
-            this.schedule(Trigger.TIMER_ACTIVITY, this.machine.activityDelay);
+            this.continueHeldActivityTimer();
             return;
         }
 
@@ -462,7 +464,7 @@ class GameController {
         log.info("scheduling trigger", { trigger, delayMs: delay });
         this.setTimer(delay, () => {
             this.emitTrigger(trigger, "timer");
-        });
+        }, trigger);
     }
 
     wait(delay) {
@@ -471,10 +473,13 @@ class GameController {
         });
     }
 
-    setTimer(delay, callback) {
+    setTimer(delay, callback, trigger = null) {
         this.clearTimer();
+        const startedAt = Date.now();
+        this.pendingTimer = { trigger, delay, startedAt };
         this.timerId = setTimeout(() => {
             this.timerId = null;
+            this.pendingTimer = null;
             callback();
         }, delay);
     }
@@ -483,8 +488,34 @@ class GameController {
         if (this.timerId !== null) {
             clearTimeout(this.timerId);
             this.timerId = null;
+            this.pendingTimer = null;
             log.info("cleared pending timer");
         }
+    }
+
+    holdActivityTimer() {
+        if (this.pendingTimer?.trigger !== Trigger.TIMER_ACTIVITY) {
+            this.clearTimer();
+            return;
+        }
+
+        const elapsed = Date.now() - this.pendingTimer.startedAt;
+        this.heldActivityDelay = Math.max(0, this.pendingTimer.delay - elapsed);
+        log.info("activity timer put on hold", {
+            remainingMs: this.heldActivityDelay,
+        });
+        this.clearTimer();
+    }
+
+    continueHeldActivityTimer() {
+        if (this.heldActivityDelay !== null) {
+            const delay = this.heldActivityDelay;
+            this.heldActivityDelay = null;
+            this.schedule(Trigger.TIMER_ACTIVITY, delay);
+            return;
+        }
+
+        this.schedule(Trigger.TIMER_ACTIVITY, this.machine.activityDelay);
     }
 }
 
