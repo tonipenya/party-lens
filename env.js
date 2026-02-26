@@ -36,6 +36,38 @@ const DELAY_BETWEEN_BURST_SHOTS = 2 * 60 * 1000;
 let wakeLock = null;
 let wakeLockListenersBound = false;
 
+class Logger {
+    constructor(scope) {
+        this.scopePrefix = `[${scope}]`;
+    }
+
+    info(message, context) {
+        if (context === undefined) {
+            console.info(`${this.scopePrefix} ${message}`);
+            return;
+        }
+        console.info(`${this.scopePrefix} ${message}`, context);
+    }
+
+    warn(message, context) {
+        if (context === undefined) {
+            console.warn(`${this.scopePrefix} ${message}`);
+            return;
+        }
+        console.warn(`${this.scopePrefix} ${message}`, context);
+    }
+
+    err(message, context) {
+        if (context === undefined) {
+            console.error(`${this.scopePrefix} ${message}`);
+            return;
+        }
+        console.error(`${this.scopePrefix} ${message}`, context);
+    }
+}
+
+const log = new Logger("env");
+
 function getLanguageFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const lang = params.get("lang")?.toLowerCase();
@@ -63,21 +95,24 @@ async function requestWakeLock() {
 
     try {
         wakeLock = await navigator.wakeLock.request("screen");
+        log.info("wake lock acquired");
         wakeLock.addEventListener(
             "release",
             () => {
+                log.info("wake lock released");
                 wakeLock = null;
             },
             { once: true },
         );
     } catch (error) {
-        console.warn("Wake lock request failed:", error);
+        log.warn("wake lock request failed and was handled", error);
     }
 }
 
 function keepScreenAwake(data) {
     if (!wakeLockListenersBound) {
         wakeLockListenersBound = true;
+        log.info("binding wake lock listeners");
 
         window.addEventListener("pointerdown", requestWakeLock, {
             once: true,
@@ -89,6 +124,7 @@ function keepScreenAwake(data) {
 
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
+                log.info("document visible; retrying wake lock");
                 requestWakeLock();
             }
         });
@@ -110,5 +146,6 @@ export {
     getCardText,
     getLanguageFromUrl,
     keepScreenAwake,
+    Logger,
     START_CARD,
 };

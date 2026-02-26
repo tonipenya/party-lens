@@ -8,6 +8,7 @@ import {
     DELAY_BETWEEN_PICTURES,
     END_CARD,
     FIRST_SHOT_DELAY,
+    Logger,
     START_CARD,
 } from "./env.js";
 import {
@@ -44,6 +45,7 @@ const Trigger = Object.freeze({
 });
 
 const INTERRUPT_RETRY_DELAY = 1000;
+const log = new Logger("game");
 
 class NoneCommand {}
 class ToggleFullscreenCommand {}
@@ -190,13 +192,14 @@ class GameController {
     }
 
     async mount() {
+        log.info("mounting game controller");
         showCard({ card: START_CARD }, this.language);
         await this.loadShuffledDeck();
 
         const container = document.getElementById("container");
         const onStartClick = () => {
             container.removeEventListener("click", onStartClick);
-            this.execute(this.machine.nextCommand(Trigger.CLICK));
+            this.emitTrigger(Trigger.CLICK, "ui.click");
         };
         container.addEventListener("click", onStartClick);
 
@@ -208,34 +211,49 @@ class GameController {
             const key = event.key.toLowerCase();
             if (key === "f") {
                 event.preventDefault();
-                this.execute(this.machine.nextCommand(Trigger.KEY_FULLSCREEN));
+                this.emitTrigger(Trigger.KEY_FULLSCREEN, "ui.keydown");
                 return;
             }
             if (key === "s") {
                 event.preventDefault();
-                this.execute(this.machine.nextCommand(Trigger.KEY_SETUP));
+                this.emitTrigger(Trigger.KEY_SETUP, "ui.keydown");
                 return;
             }
             if (key === "p") {
                 event.preventDefault();
-                this.execute(this.machine.nextCommand(Trigger.KEY_PAUSE));
+                this.emitTrigger(Trigger.KEY_PAUSE, "ui.keydown");
                 return;
             }
             if (key === "b") {
                 event.preventDefault();
-                this.execute(this.machine.nextCommand(Trigger.KEY_BURST_PHOTO));
+                this.emitTrigger(Trigger.KEY_BURST_PHOTO, "ui.keydown");
             }
         });
     }
 
-    async execute(command) {
+    emitTrigger(trigger, source = "internal") {
+        log.info("emitting trigger", {
+            trigger,
+            source,
+            state: this.machine.state,
+        });
+        const command = this.machine.nextCommand(trigger);
+        return this.execute(command, trigger);
+    }
+
+    async execute(command, trigger = null) {
+        log.info("executing command", {
+            command: command.constructor.name,
+            trigger,
+            state: this.machine.state,
+        });
         try {
             switch (command.constructor) {
                 case NoneCommand:
                     return;
                 case ToggleFullscreenCommand:
                     toggleFullscreen().catch((error) =>
-                        console.warn("Fullscreen request failed:", error),
+                        log.warn("fullscreen request failed and was handled", error),
                     );
                     return;
                 case ScheduleCommand:
@@ -263,22 +281,27 @@ class GameController {
                     this.endBurst(command.previousState);
                     return;
                 default:
-                    console.warn("Unknown command:", command);
+                    log.warn("unknown command ignored", command);
                     return;
             }
         } catch (error) {
-            console.error("Command execution failed:", error);
+            log.err("command execution failed; starting recovery", error);
             await this.recover();
         }
     }
 
     async runActivity() {
         if (this.deck.length === 0) {
+            log.info("deck exhausted; ending game");
             this.machine.endGame();
             showCard({ card: END_CARD }, this.language);
             return;
         }
 
+        log.info("running activity", {
+            cardsRemaining: this.deck.length,
+            nextDelayMs: this.machine.activityDelay,
+        });
         const card = this.deck.pop();
         const { video } = await this.camera.startCamera();
 
@@ -293,10 +316,11 @@ class GameController {
         await this.wait(DELAY_BETWEEN_PICTURES);
 
         showIdle();
-        await this.execute(this.machine.nextCommand(Trigger.ACTIVITY_COMPLETED));
+        await this.emitTrigger(Trigger.ACTIVITY_COMPLETED, "activity");
     }
 
     async showBurst() {
+        log.info("starting burst photo step");
         this.clearTimer();
 
         const { video } = await this.camera.startCamera();
@@ -308,10 +332,11 @@ class GameController {
         hideCapturedImage();
         this.camera.stopCamera(data);
         showIdle();
-        await this.execute(this.machine.nextCommand(Trigger.BURST_PICTURE_TAKEN));
+        await this.emitTrigger(Trigger.BURST_PICTURE_TAKEN, "burst");
     }
 
     async enterSetup() {
+        log.info("entering setup mode");
         this.clearTimer();
 
         const { video } = await this.camera.startCamera();
@@ -320,20 +345,24 @@ class GameController {
     }
 
     exitSetup(previousState) {
+        log.info("exiting setup mode", { previousState });
         this.camera.stopCamera();
         this.restoreViewFromPreviousState(previousState);
     }
 
     enterPause() {
+        log.info("entering pause mode");
         this.clearTimer();
         showPause();
     }
 
     exitPause(previousState) {
+        log.info("exiting pause mode", { previousState });
         this.restoreViewFromPreviousState(previousState);
     }
 
     endBurst(previousState) {
+        log.info("ending burst mode", { previousState });
         this.clearTimer();
         this.camera.stopCamera();
         hideCapturedImage();
@@ -364,6 +393,7 @@ class GameController {
     }
 
     async captureAfterDelay(data, delay) {
+        log.info("waiting before capture", { delayMs: delay });
         await this.wait(delay);
         this.camera.takePicture(data);
         showCapturedImage(data);
@@ -374,15 +404,17 @@ class GameController {
         const deck = await response.json();
         // Good-enough in-place shuffle for party prompts.
         this.deck = deck.sort(() => Math.random() - 0.5);
+        log.info("deck loaded and shuffled", { size: this.deck.length });
     }
 
     async recover() {
         const state = this.machine.state;
+        log.warn("running recovery flow", { state });
 
         if (state === State.ACTIVITY) {
             this.camera.stopCamera();
             showIdle();
-            await this.execute(this.machine.nextCommand(Trigger.ACTIVITY_COMPLETED));
+            await this.emitTrigger(Trigger.ACTIVITY_COMPLETED, "recovery");
             return;
         }
 
@@ -423,10 +455,14 @@ class GameController {
 
         this.machine.state = State.NOT_STARTED;
         showCard({ card: START_CARD }, this.language);
+        log.warn("recovery returned to start state");
     }
 
     schedule(trigger, delay) {
-        this.setTimer(delay, () => this.execute(this.machine.nextCommand(trigger)));
+        log.info("scheduling trigger", { trigger, delayMs: delay });
+        this.setTimer(delay, () => {
+            this.emitTrigger(trigger, "timer");
+        });
     }
 
     wait(delay) {
@@ -447,6 +483,7 @@ class GameController {
         if (this.timerId !== null) {
             clearTimeout(this.timerId);
             this.timerId = null;
+            log.info("cleared pending timer");
         }
     }
 }

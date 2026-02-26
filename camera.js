@@ -1,3 +1,7 @@
+import { Logger } from "./env.js";
+
+const log = new Logger("camera");
+
 class Camera {
     constructor(overlay) {
         this.overlay = overlay;
@@ -9,6 +13,7 @@ class Camera {
     }
 
     async startCamera() {
+        log.info("requesting media stream");
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 width: { ideal: 4096 },
@@ -29,6 +34,10 @@ class Camera {
         });
 
         await video.play();
+        log.info("camera stream started", {
+            width: video.videoWidth,
+            height: video.videoHeight,
+        });
 
         // Let autofocus and autoexposure settle before taking the picture.
         await new Promise((resolve) => setTimeout(resolve, 800));
@@ -37,6 +46,7 @@ class Camera {
     }
 
     takePicture(data) {
+        log.info("taking picture");
         const { card, video, language } = data;
 
         this.flashScreen();
@@ -50,7 +60,7 @@ class Camera {
 
         canvas.toBlob((blob) => {
             if (!blob) {
-                console.warn("Failed to create image blob for download.");
+                log.warn("failed to create image blob for download");
                 return;
             }
             const url = URL.createObjectURL(blob);
@@ -63,6 +73,8 @@ class Camera {
     }
 
     stopCamera(data) {
+        log.info("stopping media stream");
+        const hadStream = Boolean(this.currentStream);
         if (this.currentStream) {
             this.currentStream.getTracks().forEach((t) => t.stop());
             this.currentStream = null;
@@ -70,6 +82,9 @@ class Camera {
         if (this.currentVideo) {
             this.currentVideo.srcObject = null;
             this.currentVideo = null;
+        }
+        if (hadStream) {
+            log.info("camera stream stopped");
         }
         return data;
     }
